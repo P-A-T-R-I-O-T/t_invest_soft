@@ -1,0 +1,81 @@
+/* light.css — Светлая тема */
+
+
+* {
+    margin: 0;
+    padding: 0;
+    outline: none;
+    font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+QMainWindow {
+    background-color: #f5f6f7;
+    border-radius: 12px;
+}
+
+QMenuBar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 4px;
+}
+
+QMenuBar::item {
+    background-color: transparent;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin: 0 2px;
+}
+
+QMenuBar::item:selected {
+    background-color: #e9ecef;
+}
+
+QMenuBar::item:pressed {
+    background-color: #dee2e6;
+}
+
+QMenu {
+    background-color: #ffffff;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    padding: 6px;
+}
+
+QMenu::item {
+    padding: 6px 30px 6px 20px;
+    border-radius: 4px;
+}
+
+QMenu::item:selected {
+    background-color: #0078d7;
+    color: white;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: #e9ecef;
+    margin: 4px 0;
+}
+
+QLabel {
+    color: #2d3436;
+    font-size: 15px;
+    font-family: "Segoe UI", sans-serif;
+}
+
+QPushButton {
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+QPushButton:hover {
+    background-color: #0063b1;
+}
+
+QPushButton:pressed {
+    background-color: #004578;
+}

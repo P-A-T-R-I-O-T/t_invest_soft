@@ -1,0 +1,147 @@
+/* dark.css — Тёмная тема */
+/* Полностью кастомная тема для PySide6/Qt-приложения.
+   Все стили переопределяют системные, обеспечивая единый, современный вид. */
+
+/* === ГЛОБАЛЬНЫЕ СТИЛИ === */
+
+* {
+    margin: 0;                    /* Убираем все внешние отступы по умолчанию */
+    padding: 0;                   /* Убираем внутренние отступы — полный контроль */
+    outline: none;                /* Убираем "голубой" контур при фокусе (можно вернуть, если нужно) */
+    font-family: "Segoe UI", "Arial", sans-serif;  /* Единый шрифт для всего интерфейса */
+}
+
+/* === ФОН И ОСНОВНОЕ ОКНО === */
+
+QMainWindow {
+    background-color: #1e1e1e;    /* Глубокий тёмный фон окна */
+    border-radius: 12px;          /* Скруглённые углы окна (если включено в стиле) */
+}
+
+/* === ВЕРХНЕЕ МЕНЮ (Меню-бар) === */
+
+QMenuBar {
+    background-color: #2d2d2d;    /* Тёмно-серый фон меню */
+    border-bottom: 1px solid #404040;  /* Лёгкая граница снизу для разделения */
+    padding: 4px;                 /* Отступы внутри меню-бара */
+}
+
+QMenuBar::item {
+    background-color: transparent; /* Пункты меню прозрачные по умолчанию */
+    padding: 6px 10px;            /* Внутренние отступы у пунктов */
+    border-radius: 6px;           /* Скруглённые углы при наведении */
+    margin: 0 2px;                /* Маленькие отступы между пунктами */
+    color: #e0e0e0;               /* ✅ Светло-серый текст — хорошо виден на тёмном фоне */
+    font-size: 14px;              /* Опционально: размер шрифта */
+}
+
+QMenuBar::item:selected {
+    background-color: #3c3c3c;    /* Цвет при наведении курсора */
+    color: white;                 /* ✅ Белый текст при наведении — отличный контраст */
+}
+
+QMenuBar::item:pressed {
+    background-color: #505050;    /* Цвет при нажатии */
+    color: white;                 /* ✅ Белый при нажатии */
+}
+
+/* === ВЫПАДАЮЩИЕ МЕНЮ === */
+
+QMenu {
+    background-color: #2d2d2d;    /* Фон выпадающего меню */
+    border: 1px solid #404040;    /* Рамка вокруг меню */
+    border-radius: 8px;           /* Скруглённые углы */
+    padding: 6px;                 /* Отступы внутри меню */
+}
+
+QMenu::item {
+    padding: 6px 30px 6px 20px;   /* Горизонтальные отступы: слева — меньше, справа — больше (для горячих клавиш) */
+    border-radius: 4px;           /* Скругление при наведении */
+    color: #d4d4d4;               /* Светло-серый текст */
+}
+
+QMenu::item:selected {
+    background-color: #007acc;    /* Синий фон при наведении */
+    color: white;                 /* Белый текст при наведении */
+}
+
+QMenu::separator {
+    height: 1px;                  /* Тонкая линия-разделитель */
+    background: #404040;          /* Цвет разделителя */
+    margin: 4px 0;                /* Отступы сверху и снизу */
+}
+
+/* === ТЕКСТ И МЕТКИ === */
+
+QLabel {
+    color: #e0e0e0;               /* Светло-серый цвет текста */
+    font-size: 15px;              /* Читабельный размер шрифта */
+}
+
+/* === БАЗОВЫЕ СТИЛИ ДЛЯ ВСЕХ ИНТЕРАКТИВНЫХ ЭЛЕМЕНТОВ === */
+
+QPushButton, QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox {
+    padding: 8px 12px;            /* Унифицированные отступы */
+    border: 1px solid #555;       /* Лёгкая рамка */
+    border-radius: 6px;           /* Скруглённые углы */
+    background-color: #333;       /* Тёмно-серый фон */
+    min-height: 30px;             /* Минимальная высота — чтобы все поля были одинаковыми */
+    color: #e0e0e0;               /* Светлый текст */
+}
+
+/* === КНОПКИ === */
+
+QPushButton {
+    background-color: #007acc;    /* Ярко-синий фон */
+    color: white;                 /* Белый текст */
+    border: none;                 /* Убираем рамку — стиль полностью кастомный */
+    padding: 10px 20px;           /* Больше отступов — кнопка выделяется */
+    font-size: 14px;              /* Размер шрифта */
+}
+
+QPushButton:hover {
+    background-color: #198fff;    /* Светлее при наведении — визуальный отклик */
+}
+
+QPushButton:pressed {
+    background-color: #005a9e;    /* Темнее при нажатии — эффект "нажатия" */
+}
+
+/* === ПОЛЯ ВВОДА И ВЫПАДАЮЩИЕ СПИСКИ === */
+
+QLineEdit, QComboBox {
+    padding: 8px;                 /* Внутренние отступы */
+    border: 1px solid #555;       /* Рамка */
+    background-color: #333;       /* Тёмный фон */
+    selection-background-color: #007acc;  /* Синий фон при выделении текста */
+    /* Qt-специфичное свойство — IDE может подсвечивать, но работает отлично */
+}
+
+/* === СПИСОК: стрелка вниз === */
+
+QComboBox::drop-down {
+    border: none;                 /* Убираем рамку у кнопки раскрытия */
+    width: 30px;                  /* Фиксированная ширина — чтобы стрелка не "прыгала" */
+}
+
+QComboBox::down-arrow {
+    /* Встраиваем иконку стрелки в base64 — не нужно внешних файлов */
+    /* Это маленькая белая стрелка вниз, закодированная в PNG */
+    image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAABnSURBVHjaYvz//z8DJQDCfyaGL0D8H4gZ0QIMDP///0e7CJ2RQPwfE0cEiBkQAAZkQwF8ZgDxHyBmQAAAGBAABoJmBhD/A2IGBACAAQEAYEAAABgQAACGDAEBBiRaAeNMAAAAAElFTkSuQmCC);
+}
+
+/* === СКРОЛЛБАР (опционально, но улучшает внешний вид) === */
+
+QScrollBar:vertical {
+    width: 10px;                  /* Ширина вертикального скроллбара */
+    background: #2d2d2d;          /* Фон */
+}
+
+QScrollBar::handle:vertical {
+    background: #555;             /* Ползунок — серый */
+    border-radius: 5px;           /* Скруглённые края */
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #666;             /* При наведении — светлее */
+}
