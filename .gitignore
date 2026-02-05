@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+ipynb_checkpoints
+
+# IDE
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+*.swp
+*.swo
+*.tmp
+*~
+
+# PyCharm / VS Code
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Virtual Environment
+.env
+.venv
+env/
+venv/
+
+# Системные
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Личные данные
+key.key
+participants.enc

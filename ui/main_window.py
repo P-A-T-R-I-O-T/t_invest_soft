@@ -27,10 +27,10 @@ class MainWindow(QMainWindow):
 
         # Создаём меню
         menu_bar = self.menuBar()
-        FileMenu(menu_bar, self)        # ← создаём меню
-        TrainingMenu(menu_bar, self)
-        TradeMenu(menu_bar, self)
-        SettingsMenu(menu_bar, self)
+        self.file_menu = FileMenu(menu_bar, self)        # ← создаём меню
+        self.training_menu = TrainingMenu(menu_bar, self)
+        self.trade_menu = TradeMenu(menu_bar, self)
+        self.settings_menu = SettingsMenu(menu_bar, self)
 
     def load_stylesheet(self, path):
         """Загружает CSS из файла и применяет как стиль."""
