@@ -2,10 +2,10 @@ from PySide6.QtWidgets import QMainWindow, QLabel, QVBoxLayout, QWidget
 from PySide6.QtCore import Qt
 
 # Импортируем наши меню
-from ui.menus.file import FileMenu
-from ui.menus.training import TrainingMenu
-from ui.menus.trade import TradeMenu
-from ui.menus.settings import SettingsMenu
+from ui.menus.file.file_main import FileMenu
+from ui.menus.training.training import TrainingMenu
+from ui.menus.trade.trade import TradeMenu
+from ui.menus.settings.settings import SettingsMenu
 
 
 class MainWindow(QMainWindow):

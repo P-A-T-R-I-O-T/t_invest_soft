@@ -17,7 +17,7 @@ def main():
     app.main_window = window
 
     # Загружаем стиль по умолчанию
-    window.load_stylesheet("styles/light.css")
+    # window.load_stylesheet("styles/light.css")
 
     window.show()
     sys.exit(app.exec())
