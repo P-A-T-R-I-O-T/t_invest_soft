@@ -25,6 +25,8 @@ class ChooseMainAccountMenu(QMenu):
         if saved_account and self.manager.name_exists(saved_account):
             self.current_account = saved_account
             self.parent_window.setWindowTitle(f"T-Invest — аккаунт: {saved_account}")
+        else:
+            self._update_window_title()  # Пустой заголовок, если нет аккаунта
 
         self.aboutToShow.connect(self._populate_menu)
 
@@ -34,10 +36,22 @@ class ChooseMainAccountMenu(QMenu):
 
         participants = self.manager.list_participants()
 
+        # Если текущий аккаунт больше не существует — сбрасываем его
+        if self.current_account and not self.manager.name_exists(self.current_account):
+            self.current_account = None
+            self.settings.remove("last_selected_account")  # Удаляем из настроек
+            self._update_window_title()  # Обновляем заголовок
+
         if not participants:
             no_action = QAction("Нет сохранённых аккаунтов", self.parent())
             no_action.setEnabled(False)
             self.addAction(no_action)
+
+            # Сбрасываем текущий аккаунт и обновляем заголовок
+            if self.current_account:
+                self.current_account = None
+                self._update_window_title()
+
         else:
             for name in participants:
                 action = QAction(name, self.parent())
@@ -52,6 +66,13 @@ class ChooseMainAccountMenu(QMenu):
         self.parent_window.setWindowTitle(f"T-Invest — аккаунт: {name}")
         self.settings.setValue("last_selected_account", name)  # Сохраняем
         print(f"✅ Основной аккаунт установлен: {name}")
+
+    def _update_window_title(self, name=None):
+        """Обновляет заголовок окна. Если имя не передано — убирает упоминание аккаунта."""
+        if name:
+            self.parent_window.setWindowTitle(f"T-Invest — аккаунт: {name}")
+        else:
+            self.parent_window.setWindowTitle("T-Invest")
 
     def get_current_account(self) -> str or None:
         """Возвращает текущий выбранный аккаунт."""

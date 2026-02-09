@@ -1,3 +1,5 @@
+# main_windows.py
+
 from PySide6.QtWidgets import QMainWindow, QLabel, QVBoxLayout, QWidget
 from PySide6.QtCore import Qt
 
