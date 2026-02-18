@@ -8,7 +8,7 @@ from PySide6.QtGui import QClipboard
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel,
     QLineEdit, QPlainTextEdit, QPushButton, QMessageBox,
-    QApplication
+    QApplication, QCheckBox
 )
 from data.participants_manager import ParticipantsManager
 
@@ -48,6 +48,11 @@ class AddParticipantDialog(QDialog):
         self.token_input.setTabChangesFocus(True)
         layout.addWidget(self.token_input, alignment=Qt.AlignLeft)
 
+        # --- Галочка "Песочница" ---
+        self.sandbox_checkbox = QCheckBox("Пользователь для песочницы")
+        self.sandbox_checkbox.setToolTip("Если отмечено, пользователь будет создан для песочницы с ограниченными правами")
+        layout.addWidget(self.sandbox_checkbox, alignment=Qt.AlignLeft)
+
         # --- Кнопка "Вставить" ---
         self.paste_btn = QPushButton("Вставить")
         self.paste_btn.setFixedWidth(100)
@@ -77,13 +82,14 @@ class AddParticipantDialog(QDialog):
     def on_add(self):
         name = self.name_input.text().strip()
         token = self.token_input.toPlainText().strip()
+        is_sandbox = self.sandbox_checkbox.isChecked()
 
         if not name:
             self.show_error("Имя участника не может быть пустым.")
             return
 
         try:
-            self.manager.add_participant(name, token)
+            self.manager.add_participant(name, token, is_sandbox)
             self.accept()
         except Exception as e:
             self.show_error(f"Ошибка при сохранении участника:\n{str(e)}")

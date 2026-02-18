@@ -45,9 +45,9 @@ class ParticipantsManager:
                 f.write(key)
             return key
 
-    def add_participant(self, name: str, token: str) -> bool:
+    def add_participant(self, name: str, token: str, is_sandbox: bool = False) -> bool:
         """
-        Добавляет нового участника с именем и токеном.
+        Добавляет нового участника с именем, токеном и флагом писочницы.
         Перед добавлением:
         - Проверяет, что имя и токен не пустые
         - Проверяет, что имя ещё не занято
@@ -64,7 +64,11 @@ class ParticipantsManager:
             return False
 
         # Подготавливаем данные для шифрования
-        data = {"name": name, "token": token}
+        data = {
+            "name": name,
+            "token": token,
+            "is_sandbox": is_sandbox  # сохраняем статус песочницы
+        }
         # Преобразуем данные в строку JSON и шифруем её
         encrypted_data = self.cipher.encrypt(json.dumps(data).encode())
 
@@ -73,7 +77,7 @@ class ParticipantsManager:
         with open(DATA_FILE, "ab") as f:
             f.write(encrypted_data + b"\n")
 
-        print(f"✅ Участник '{name}' успешно добавлен.")
+        print(f"✅ Участник '{name}' успешно добавлен. Песочница: {is_sandbox}")
         return True
 
     def name_exists(self, name: str) -> bool:
@@ -129,6 +133,39 @@ class ParticipantsManager:
         except Exception as e:
             print(f"⚠️ Ошибка при получении токена: {e}")
         return None
+    
+    def get_participant_by_name(self, name: str) -> dict or None:
+        """
+        Ищет участника по имени и возвращает все его данные (включая флаг песочницы).
+        Используется для проверки типа пользователя.
+        Возвращает словарь с данными участника или None, если не найден.
+        """
+        if not os.path.exists(DATA_FILE):
+            return None
+
+        try:
+            with open(DATA_FILE, "rb") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    decrypted_data = self.cipher.decrypt(line).decode()
+                    participant = json.loads(decrypted_data)
+                    if participant["name"] == name:
+                        return participant  # Возвращаем все данные участника
+        except Exception as e:
+            print(f"⚠️ Ошибка при получении данных участника: {e}")
+        return None
+    
+    def is_sandbox_user(self, name: str) -> bool:
+        """
+        Проверяет, является ли участник пользователем песочницы.
+        Возвращает True, если пользователь песочницы, иначе False (или если не найден).
+        """
+        participant = self.get_participant_by_name(name)
+        if participant and "is_sandbox" in participant:
+            return participant["is_sandbox"]
+        return False  # По умолчанию считаем реальным пользователем
 
     def list_participants(self) -> list:
         """
