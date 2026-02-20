@@ -5,7 +5,7 @@ import os
 from cryptography.fernet import Fernet
 
 # Пути к файлам
-KEY_FILE = "data/unique_data/key.key"       # Файл для хранения ключа шифрования
+KEY_FILE = "data/unique_data/key.key"  # Файл для хранения ключа шифрования
 DATA_FILE = "data/unique_data/participants.enc"  # Файл для хранения зашифрованных данных участников
 
 class ParticipantsManager:
@@ -23,8 +23,6 @@ class ParticipantsManager:
 
         self.key = self.load_or_generate_key()  # Получаем ключ (создаём, если нет)
         self.cipher = Fernet(self.key)  # Объект для шифрования и расшифровки
-
-
 
     def load_or_generate_key(self):
         """
@@ -47,7 +45,7 @@ class ParticipantsManager:
 
     def add_participant(self, name: str, token: str, is_sandbox: bool = False) -> bool:
         """
-        Добавляет нового участника с именем, токеном и флагом писочницы.
+        Добавляет нового участника с именем, токеном и флагом песочницы.
         Перед добавлением:
         - Проверяет, что имя и токен не пустые
         - Проверяет, что имя ещё не занято
@@ -104,8 +102,8 @@ class ParticipantsManager:
                     # Преобразуем JSON обратно в словарь
                     participant = json.loads(decrypted_data)
                     # Сравниваем имя
-                    if participant["name"] == name:
-                        return True
+            if participant["name"] == name:
+                return True
         except Exception as e:
             # Если произошла ошибка (например, повреждённая запись), выводим предупреждение
             print(f"⚠️ Ошибка при чтении файла: {e}")
@@ -126,14 +124,14 @@ class ParticipantsManager:
                     line = line.strip()
                     if not line:
                         continue
-                    decrypted_data = self.cipher.decrypt(line).decode()
-                    participant = json.loads(decrypted_data)
-                    if participant["name"] == name:
-                        return participant["token"]  # Возвращаем токен
+            decrypted_data = self.cipher.decrypt(line).decode()
+            participant = json.loads(decrypted_data)
+            if participant["name"] == name:
+                return participant["token"]  # Возвращаем токен
         except Exception as e:
             print(f"⚠️ Ошибка при получении токена: {e}")
         return None
-    
+
     def get_participant_by_name(self, name: str) -> dict or None:
         """
         Ищет участника по имени и возвращает все его данные (включая флаг песочницы).
@@ -149,14 +147,14 @@ class ParticipantsManager:
                     line = line.strip()
                     if not line:
                         continue
-                    decrypted_data = self.cipher.decrypt(line).decode()
-                    participant = json.loads(decrypted_data)
-                    if participant["name"] == name:
-                        return participant  # Возвращаем все данные участника
+            decrypted_data = self.cipher.decrypt(line).decode()
+            participant = json.loads(decrypted_data)
+            if participant["name"] == name:
+                return participant  # Возвращаем все данные участника
         except Exception as e:
             print(f"⚠️ Ошибка при получении данных участника: {e}")
         return None
-    
+
     def is_sandbox_user(self, name: str) -> bool:
         """
         Проверяет, является ли участник пользователем песочницы.
@@ -167,75 +165,78 @@ class ParticipantsManager:
             return participant["is_sandbox"]
         return False  # По умолчанию считаем реальным пользователем
 
-    def list_participants(self) -> list:
-        """
-        Возвращает список имён всех участников.
-        Используется, например, для выпадающего меню в интерфейсе.
-        Возвращает просто список имён: ['Анна', 'Иван', 'Мария']
-        """
-        names = []
-        if not os.path.exists(DATA_FILE):
-            return names
-
-        try:
-            with open(DATA_FILE, "rb") as f:
-                for line in f:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    decrypted_data = self.cipher.decrypt(line).decode()
-                    participant = json.loads(decrypted_data)
-                    names.append(participant["name"])
-        except Exception as e:
-            print(f"⚠️ Ошибка при чтении списка: {e}")
+def list_participants(self) -> list:
+    """
+    Возвращает список имён всех участников.
+    Используется, например, для выпадающего меню в интерфейсе.
+    Возвращает просто список имён: ['Анна', 'Иван', 'Мария']
+    """
+    names = []
+    if not os.path.exists(DATA_FILE):
         return names
 
-    def remove_participant(self, name: str) -> bool:
-        """
-        Удаляет участника по имени.
-        Как работает:
-        - Считывает все записи и расшифровывает их
-        - Перезаписывает файл, пропуская запись с нужным именем
-        Возвращает True, если участник был найден и удалён.
-        """
-        participants = self.list_all_decrypted()  # Получаем все расшифрованные данные
-        success = False  # Флаг: удалили ли кого-то
+    try:
+        with open(DATA_FILE, "rb") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                decrypted_data = self.cipher.decrypt(line).decode()
+                participant = json.loads(decrypted_data)
+                names.append(participant["name"])
+    except Exception as e:
+        print(f"⚠️ Ошибка при чтении списка: {e}")
+    return names
 
-        # Перезаписываем файл, не включая удалённого участника
-        with open(DATA_FILE, "wb") as f:
-            for p in participants:
-                if p["name"] != name:
-                    # Шифруем и записываем всех, кроме удаляемого
-                    encrypted = self.cipher.encrypt(json.dumps(p).encode())
-                    f.write(encrypted + b"\n")
-                else:
-                    success = True  # Нашли и пропустили — значит, удалили
 
-        if success:
-            print(f"🗑️ Участник '{name}' удалён.")
-        return success
 
-    def list_all_decrypted(self) -> list:
-        """
-        Вспомогательный метод.
-        Возвращает список всех участников в виде словарей (расшифрованных).
-        Используется внутри других методов, например, при удалении.
-        Не для прямого вызова извне — данные расшифровываются, поэтому нужно быть осторожным.
-        """
-        participants = []
-        if not os.path.exists(DATA_FILE):
-            return participants
+def remove_participant(self, name: str) -> bool:
+    """
+    Удаляет участника по имени.
+    Как работает:
+    - Считывает все записи и расшифровывает их
+    - Перезаписывает файл, пропуская запись с нужным именем
+    Возвращает True, если участник был найден и удалён.
+    """
+    participants = self.list_all_decrypted()  # Получаем все расшифрованные данные
+    success = False  # Флаг: удалили ли кого‑то
 
-        try:
-            with open(DATA_FILE, "rb") as f:
-                for line in f:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    decrypted_data = self.cipher.decrypt(line).decode()
-                    participant = json.loads(decrypted_data)
-                    participants.append(participant)
-        except Exception as e:
-            print(f"⚠️ Ошибка при расшифровке: {e}")
+    # Перезаписываем файл, не включая удалённого участника
+    with open(DATA_FILE, "wb") as f:
+        for p in participants:
+            if p["name"] != name:
+                # Шифруем и записываем всех, кроме удаляемого
+                encrypted = self.cipher.encrypt(json.dumps(p).encode())
+                f.write(encrypted + b"\n")
+            else:
+                success = True  # Нашли и пропустили — значит, удалили
+
+    if success:
+        print(f"🗑️ Участник '{name}' удалён.")
+    return success
+
+
+
+def list_all_decrypted(self) -> list:
+    """
+    Вспомогательный метод.
+    Возвращает список всех участников в виде словарей (расшифрованных).
+    Используется внутри других методов, например, при удалении.
+    Не для прямого вызова извне — данные расшифровываются, поэтому нужно быть осторожным.
+    """
+    participants = []
+    if not os.path.exists(DATA_FILE):
         return participants
 
+    try:
+        with open(DATA_FILE, "rb") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                decrypted_data = self.cipher.decrypt(line).decode()
+                participant = json.loads(decrypted_data)
+                participants.append(participant)
+    except Exception as e:
+        print(f"⚠️ Ошибка при расшифровке: {e}")
+    return participants

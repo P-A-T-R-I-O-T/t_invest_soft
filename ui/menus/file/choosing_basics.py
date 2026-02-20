@@ -18,7 +18,7 @@ class ChooseMainAccountMenu(QMenu):
         self.parent_window = parent
         self.manager = ParticipantsManager()
         self.current_account = None
-        self.settings = QSettings("T-Invest", "T-Invest")  # Организация и приложение
+        self.settings = QSettings("T-Invest", "T-Invest") # Организация и приложение
 
         # Восстанавливаем последний выбранный аккаунт при старте
         saved_account = self.settings.value("last_selected_account", "")
@@ -26,7 +26,7 @@ class ChooseMainAccountMenu(QMenu):
             self.current_account = saved_account
             self.parent_window.setWindowTitle(f"T-Invest — аккаунт: {saved_account}")
         else:
-            self._update_window_title()  # Пустой заголовок, если нет аккаунта
+            self._update_window_title() # Пустой заголовок, если нет аккаунта
 
         self.aboutToShow.connect(self._populate_menu)
 
@@ -39,18 +39,18 @@ class ChooseMainAccountMenu(QMenu):
         # Если текущий аккаунт больше не существует — сбрасываем его
         if self.current_account and not self.manager.name_exists(self.current_account):
             self.current_account = None
-            self.settings.remove("last_selected_account")  # Удаляем из настроек
-            self._update_window_title()  # Обновляем заголовок
+        self.settings.remove("last_selected_account") # Удаляем из настроек
+        self._update_window_title() # Обновляем заголовок
 
         if not participants:
             no_action = QAction("Нет сохранённых аккаунтов", self.parent())
-            no_action.setEnabled(False)
-            self.addAction(no_action)
+        no_action.setEnabled(False)
+        self.addAction(no_action)
 
-            # Сбрасываем текущий аккаунт и обновляем заголовок
-            if self.current_account:
-                self.current_account = None
-                self._update_window_title()
+        # Сбрасываем текущий аккаунт и обновляем заголовок
+        if self.current_account:
+            self.current_account = None
+            self._update_window_title()
 
         else:
             for name in participants:
@@ -64,7 +64,7 @@ class ChooseMainAccountMenu(QMenu):
         """Устанавливает выбранный аккаунт и сохраняет его в настройках."""
         self.current_account = name
         self.parent_window.setWindowTitle(f"T-Invest — аккаунт: {name}")
-        self.settings.setValue("last_selected_account", name)  # Сохраняем
+        self.settings.setValue("last_selected_account", name) # Сохраняем
         print(f"✅ Основной аккаунт установлен: {name}")
 
     def _update_window_title(self, name=None):
