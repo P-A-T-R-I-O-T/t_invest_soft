@@ -67,10 +67,6 @@ class ChooseMainAccountMenu(QMenu):
         self.settings.setValue("last_selected_account", name)  # Сохраняем
         print(f"✅ Основной аккаунт установлен: {name}")
 
-        # Обновляем состояние меню "Файл"
-        if hasattr(self.parent_window, 'file_menu') and self.parent_window.file_menu:
-            self.parent_window.file_menu._update_menu_state()
-
     def _update_window_title(self, name=None):
         """Обновляет заголовок окна. Если имя не передано — убирает упоминание аккаунта."""
         if name:
@@ -78,6 +74,6 @@ class ChooseMainAccountMenu(QMenu):
         else:
             self.parent_window.setWindowTitle("T-Invest")
 
-    def get_current_account(self) -> str | None:
+    def get_current_account(self) -> str or None:
         """Возвращает текущий выбранный аккаунт."""
         return self.current_account

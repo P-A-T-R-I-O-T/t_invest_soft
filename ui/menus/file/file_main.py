@@ -25,7 +25,6 @@ class FileMenu:
         self._setup_actions()
         # Подключаем обновление состояния при открытии меню
         self.menu.aboutToShow.connect(self._update_menu_state)
-        self.sandbox_action = None  # Ссылка на пункт "Настройка песочницы"
 
     def _setup_actions(self):
         # --- Добавить участника ---
@@ -44,46 +43,17 @@ class FileMenu:
         self.delete_action.triggered.connect(self.open_delete_participant_dialog)
         self.menu.addAction(self.delete_action)
 
-        # --- Разделитель ---
-        self.menu.addSeparator()
-
-        # --- Настройка песочницы ---
-        self.sandbox_action = QAction("Настройка песочницы", self.parent)
-        self.sandbox_action.setStatusTip("Открыть настройки песочницы для тестирования")
-        self.sandbox_action.triggered.connect(self.open_sandbox_settings)
-        self.menu.addAction(self.sandbox_action)
-
         # --- Выход ---
         exit_action = QAction("Выход", self.parent)
         exit_action.setStatusTip("Закрыть приложение")
         exit_action.triggered.connect(self.parent.close)
         self.menu.addAction(exit_action)
 
-            # Подключаем обновление состояния при открытии меню
-        self.menu.aboutToShow.connect(self._update_menu_state)
-
 
     def _update_menu_state(self):
         """Обновляет состояние пунктов меню при его открытии."""
         participants_exist = len(self.manager.list_participants()) > 0
         self.delete_action.setEnabled(participants_exist)
-
-        # Инициализируем current_account заранее — всегда есть значение
-        current_account = None
-
-        # Проверяем существование sandbox_action и choose_account_menu
-        if self.sandbox_action is not None and self.choose_account_menu is not None:
-            current_account = self.choose_account_menu.get_current_account()
-
-        # Обновляем состояние пункта «Настройка песочницы»
-        if current_account and self.sandbox_action is not None:
-            # Проверяем, является ли пользователь пользователем песочницы
-            is_sandbox = self.manager.is_sandbox_user(current_account)
-            self.sandbox_action.setEnabled(is_sandbox)
-        else:
-            # Если аккаунта нет или он реальный — отключаем пункт меню
-            if self.sandbox_action is not None:
-                self.sandbox_action.setEnabled(False)
 
     def open_add_participant_dialog(self):
         """Открывает диалог добавления участника."""
@@ -104,8 +74,3 @@ class FileMenu:
             # После удаления — обновляем список аккаунтов
             if self.choose_account_menu:
                 self.choose_account_menu._populate_menu()
-
-    def open_sandbox_settings(self):
-        """Открывает диалог настройки песочницы."""
-        # TODO: Реализовать открытие диалога настроек песочницы
-        print("Открывается диалог настройки песочницы")

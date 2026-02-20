@@ -111,7 +111,7 @@ class ParticipantsManager:
             print(f"⚠️ Ошибка при чтении файла: {e}")
         return False
 
-    def get_token_by_name(self, name: str) -> str | None:
+    def get_token_by_name(self, name: str) -> str or None:
         """
         Ищет участника по имени и возвращает его токен.
         Используется, например, при входе — чтобы проверить, правильный ли токен ввёл пользователь.
@@ -134,7 +134,7 @@ class ParticipantsManager:
             print(f"⚠️ Ошибка при получении токена: {e}")
         return None
     
-    def get_participant_by_name(self, name: str) -> dict | None:
+    def get_participant_by_name(self, name: str) -> dict or None:
         """
         Ищет участника по имени и возвращает все его данные (включая флаг песочницы).
         Используется для проверки типа пользователя.
