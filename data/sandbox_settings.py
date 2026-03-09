@@ -44,7 +44,7 @@ class SandboxSettings:
 
     def connect_to_sandbox(self) -> bool:
         """
-        Подключается к T‑Invest API в режиме песочницы, используя токен текущего аккаунта.
+        Подключается к T-Invest API в режиме песочницы, используя токен текущего аккаунта.
 
         Returns:
             bool: True при успешном подключении, иначе False.
@@ -64,9 +64,11 @@ class SandboxSettings:
             print(f"✅ Подключено к песочнице T‑Invest (аккаунт: {self.current_account})")
             return True
         except Exception as e:
-            print(f"❌ Ошибка подключения к песочнице: {e}")
-            self.client = None
-            return False
+            import sys
+        print(f"❌ Критическая ошибка подключения к песочнице: {e}", file=sys.stderr)
+        print(f"💡 Проверьте: токен корректен, интернет-соединение стабильно, API доступно.", file=sys.stderr)
+        self.client = None
+        return False
 
     def get_accounts_list(self) -> list or None:
         """

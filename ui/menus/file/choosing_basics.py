@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QMenu
 from PySide6.QtGui import QAction
 from PySide6.QtCore import QSettings
 from data.participants_manager import ParticipantsManager
+from data.sandbox_settings import SandboxSettings
 
 
 class ChooseMainAccountMenu(QMenu):
@@ -68,8 +69,25 @@ class ChooseMainAccountMenu(QMenu):
         """Устанавливает выбранный аккаунт и сохраняет его в настройках."""
         self.current_account = name
         self.parent_window.setWindowTitle(f"T-Invest — аккаунт: {name}")
-        self.settings.setValue("last_selected_account", name) # Сохраняем
+        self.settings.setValue("last_selected_account", name)
         print(f"✅ Основной аккаунт установлен: {name}")
+
+        # Создаём экземпляр настроек песочницы
+        sandbox = SandboxSettings()
+
+        # Устанавливаем текущий аккаунт для песочницы
+        if sandbox.set_current_account(name):
+            # Пытаемся подключиться к API песочницы
+            if sandbox.connect_to_sandbox():
+                # Сохраняем экземпляр в родительском окне для дальнейшего использования
+                self.parent_window.sandbox_settings = sandbox
+                print(f"✅ Автоматически подключено к песочнице для аккаунта: {name}")
+            else:
+                print(f"❌ Не удалось подключиться к песочнице для аккаунта: {name}")
+                self.parent_window.sandbox_settings = None
+        else:
+            print(f"❌ Не удалось установить аккаунт '{name}' для песочницы")
+            self.parent_window.sandbox_settings = None
 
     def _update_window_title(self, name=None):
         """Обновляет заголовок окна. Если имя не передано — убирает упоминание аккаунта."""

@@ -46,6 +46,9 @@ class MainWindow(QMainWindow):
 
         # Храним экземпляр окна песочницы (изначально None)
         self.sandbox_window = None
+        
+        # Для хранения настроек песочницы после подключения
+        self.sandbox_settings = None
 
     def open_sandbox(self):
         """Открывает окно песочницы"""
