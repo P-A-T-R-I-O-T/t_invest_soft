@@ -1,10 +1,12 @@
+# ui/main_window.py
+
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMainWindow, QLabel, QVBoxLayout, QWidget
 from PySide6.QtCore import Qt
 
 # Импортируем наши меню
 from ui.menus.file.file_main import FileMenu
-from ui.menus.sandbox.sandbox_window import SandboxWindow
+from ui.menus.sandbox.sandbox_window import SandboxSettingsWindow
 from ui.menus.training.training import TrainingMenu
 from ui.menus.trade.trade import TradeMenu
 from ui.menus.settings.settings import SettingsMenu
@@ -48,7 +50,8 @@ class MainWindow(QMainWindow):
     def open_sandbox(self):
         """Открывает окно песочницы"""
         if self.sandbox_window is None:
-            self.sandbox_window = SandboxWindow(self)
+            self.sandbox_window = SandboxSettingsWindow(self)
+            self.sandbox_window.setWindowModality(Qt.WindowModality.WindowModal)
         self.sandbox_window.show()
         self.sandbox_window.raise_() # Выносим на передний план
         self.sandbox_window.activateWindow() # Фокусируем

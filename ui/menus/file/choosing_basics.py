@@ -39,13 +39,13 @@ class ChooseMainAccountMenu(QMenu):
         # Если текущий аккаунт больше не существует — сбрасываем его
         if self.current_account and not self.manager.name_exists(self.current_account):
             self.current_account = None
-        self.settings.remove("last_selected_account") # Удаляем из настроек
-        self._update_window_title() # Обновляем заголовок
+            self.settings.remove("last_selected_account") # Удаляем из настроек
+            self._update_window_title() # Обновляем заголовок
 
         if not participants:
             no_action = QAction("Нет сохранённых аккаунтов", self.parent())
-        no_action.setEnabled(False)
-        self.addAction(no_action)
+            no_action.setEnabled(False)
+            self.addAction(no_action)
 
         # Сбрасываем текущий аккаунт и обновляем заголовок
         if self.current_account:
@@ -59,6 +59,10 @@ class ChooseMainAccountMenu(QMenu):
                 action.setChecked(name == self.current_account)
                 action.triggered.connect(lambda checked, n=name: self._select_account(n))
                 self.addAction(action)
+        
+        # Обновляем заголовок окна, если текущий аккаунт установлен
+        if self.current_account:
+            self._update_window_title(self.current_account)
 
     def _select_account(self, name: str):
         """Устанавливает выбранный аккаунт и сохраняет его в настройках."""

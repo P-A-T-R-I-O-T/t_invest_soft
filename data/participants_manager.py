@@ -165,78 +165,78 @@ class ParticipantsManager:
             return participant["is_sandbox"]
         return False  # По умолчанию считаем реальным пользователем
 
-def list_participants(self) -> list:
-    """
-    Возвращает список имён всех участников.
-    Используется, например, для выпадающего меню в интерфейсе.
-    Возвращает просто список имён: ['Анна', 'Иван', 'Мария']
-    """
-    names = []
-    if not os.path.exists(DATA_FILE):
+    def list_participants(self) -> list:
+        """
+        Возвращает список имён всех участников.
+        Используется, например, для выпадающего меню в интерфейсе.
+        Возвращает просто список имён: ['Анна', 'Иван', 'Мария']
+        """
+        names = []
+        if not os.path.exists(DATA_FILE):
+            return names
+
+        try:
+            with open(DATA_FILE, "rb") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    decrypted_data = self.cipher.decrypt(line).decode()
+                    participant = json.loads(decrypted_data)
+                    names.append(participant["name"])
+        except Exception as e:
+            print(f"⚠️ Ошибка при чтении списка: {e}")
         return names
 
-    try:
-        with open(DATA_FILE, "rb") as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                decrypted_data = self.cipher.decrypt(line).decode()
-                participant = json.loads(decrypted_data)
-                names.append(participant["name"])
-    except Exception as e:
-        print(f"⚠️ Ошибка при чтении списка: {e}")
-    return names
+
+
+    def remove_participant(self, name: str) -> bool:
+        """
+        Удаляет участника по имени.
+        Как работает:
+        - Считывает все записи и расшифровывает их
+        - Перезаписывает файл, пропуская запись с нужным именем
+        Возвращает True, если участник был найден и удалён.
+        """
+        participants = self.list_all_decrypted()  # Получаем все расшифрованные данные
+        success = False  # Флаг: удалили ли кого‑то
+
+        # Перезаписываем файл, не включая удалённого участника
+        with open(DATA_FILE, "wb") as f:
+            for p in participants:
+                if p["name"] != name:
+                    # Шифруем и записываем всех, кроме удаляемого
+                    encrypted = self.cipher.encrypt(json.dumps(p).encode())
+                    f.write(encrypted + b"\n")
+                else:
+                    success = True  # Нашли и пропустили — значит, удалили
+
+        if success:
+            print(f"🗑️ Участник '{name}' удалён.")
+        return success
 
 
 
-def remove_participant(self, name: str) -> bool:
-    """
-    Удаляет участника по имени.
-    Как работает:
-    - Считывает все записи и расшифровывает их
-    - Перезаписывает файл, пропуская запись с нужным именем
-    Возвращает True, если участник был найден и удалён.
-    """
-    participants = self.list_all_decrypted()  # Получаем все расшифрованные данные
-    success = False  # Флаг: удалили ли кого‑то
+    def list_all_decrypted(self) -> list:
+        """
+        Вспомогательный метод.
+        Возвращает список всех участников в виде словарей (расшифрованных).
+        Используется внутри других методов, например, при удалении.
+        Не для прямого вызова извне — данные расшифровываются, поэтому нужно быть осторожным.
+        """
+        participants = []
+        if not os.path.exists(DATA_FILE):
+            return participants
 
-    # Перезаписываем файл, не включая удалённого участника
-    with open(DATA_FILE, "wb") as f:
-        for p in participants:
-            if p["name"] != name:
-                # Шифруем и записываем всех, кроме удаляемого
-                encrypted = self.cipher.encrypt(json.dumps(p).encode())
-                f.write(encrypted + b"\n")
-            else:
-                success = True  # Нашли и пропустили — значит, удалили
-
-    if success:
-        print(f"🗑️ Участник '{name}' удалён.")
-    return success
-
-
-
-def list_all_decrypted(self) -> list:
-    """
-    Вспомогательный метод.
-    Возвращает список всех участников в виде словарей (расшифрованных).
-    Используется внутри других методов, например, при удалении.
-    Не для прямого вызова извне — данные расшифровываются, поэтому нужно быть осторожным.
-    """
-    participants = []
-    if not os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, "rb") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    decrypted_data = self.cipher.decrypt(line).decode()
+                    participant = json.loads(decrypted_data)
+                    participants.append(participant)
+        except Exception as e:
+            print(f"⚠️ Ошибка при расшифровке: {e}")
         return participants
-
-    try:
-        with open(DATA_FILE, "rb") as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                decrypted_data = self.cipher.decrypt(line).decode()
-                participant = json.loads(decrypted_data)
-                participants.append(participant)
-    except Exception as e:
-        print(f"⚠️ Ошибка при расшифровке: {e}")
-    return participants
