@@ -84,10 +84,15 @@ class SandboxSettings:
         try:
             with self.client as client:
                 response = client.users.get_accounts()
-                accounts = response.accounts
+                accounts = []
+                for account in response.accounts:
+                    accounts.append({
+                        'id': account.broker_account_id,
+                        'status': account.status
+                    })
                 print(f"📋 Получен список счетов для аккаунта '{self.current_account}':")
-                for account in accounts:
-                    print(f"  - {account.broker_account_id} ({account.status})")
+                for acc in accounts:
+                    print(f"  - {acc['id']} ({acc['status']})")
                 return accounts
         except Exception as e:
             print(f"❌ Ошибка при получении списка счетов: {e}")
@@ -108,3 +113,42 @@ class SandboxSettings:
             bool: True, если подключён, иначе False.
         """
         return self.client is not None
+    
+    def create_sandbox_account(self, currency: str, initial_balance: float = 0.0, name: str = "") -> dict or None:
+        """
+        Создаёт новый счёт в песочнице.
+
+        Args:
+            currency (str): валюта счёта ("RUB", "USD", "EUR").
+            initial_balance (float): начальный баланс (по умолчанию 0.0).
+            name (str): пользовательское имя счёта (опционально).
+
+        Returns:
+            dict or None: словарь с 'id' и 'status' нового счёта или None при ошибке.
+        """
+        if not self.client:
+            print("❌ Ошибка: клиент не подключён. Сначала вызовите connect_to_sandbox().")
+            return None
+
+        try:
+            with self.client as client:
+                # Формируем запрос
+                request = {
+                    "account_type": client.AccountType.AccountType_sandbox,
+                    "currency": currency,
+                    "initial_balance": initial_balance,
+                }
+                if name:
+                    request["name"] = name
+
+                response = client.sandbox.open_sandbox_account(request)
+
+                print(f"✅ Счёт создан: ID={response.account_id}, валюта={currency}, баланс={initial_balance}")
+                return {
+                    'id': response.account_id,
+                    'status': 'OPEN'  # Статус по умолчанию для нового счёта
+                }
+        except Exception as e:
+            print(f"❌ Ошибка при создании счёта: {e}")
+            return None
+

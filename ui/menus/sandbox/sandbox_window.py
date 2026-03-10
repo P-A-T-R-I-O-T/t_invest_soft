@@ -10,7 +10,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QLabel, QListWidget,
     QListWidgetItem, QPushButton, QRadioButton, QSizePolicy,
-    QTextEdit, QDialog)  # Заменили QWidget на QDialog
+    QTextEdit, QDialog)
+from ui.menus.sandbox.create_account import CreateAccountDialog
+
 
 class SandboxSettingsWindow(QDialog):  # Наследуем от QDialog для отдельного окна
     def __init__(self, parent=None):
@@ -52,6 +54,8 @@ class SandboxSettingsWindow(QDialog):  # Наследуем от QDialog для 
         self.label.setGeometry(QRect(30, 100, 41, 20))
 
         self.listWidget = QListWidget(self)
+        self.listWidget.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.listWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.listWidget.setObjectName(u"listWidget")
         self.listWidget.setGeometry(QRect(30, 130, 200, 150))
 
@@ -62,6 +66,8 @@ class SandboxSettingsWindow(QDialog):  # Наследуем от QDialog для 
         self.pushButton_2 = QPushButton(self)
         self.pushButton_2.setObjectName(u"pushButton_2")
         self.pushButton_2.setGeometry(QRect(30, 290, 80, 24))
+        self.pushButton_2.clicked.connect(self.open_create_account_dialog)
+
 
         self.label_2 = QLabel(self)
         self.label_2.setObjectName(u"label_2")
@@ -117,6 +123,62 @@ class SandboxSettingsWindow(QDialog):  # Наследуем от QDialog для 
         self.label_3.setText(QCoreApplication.translate("Form", u"Пополнить", None))
         self.pushButton_4.setText(QCoreApplication.translate("Form", u"Применить", None))
         self.pushButton_5.setText(QCoreApplication.translate("Form", u"Отменить все действия", None))
+
+    def update_accounts_list(self):
+        """Обновляет список счетов в listWidget."""
+        # Получаем настройки песочницы из родительского окна
+        sandbox_settings = self.parent().sandbox_settings
+
+        if not sandbox_settings or not sandbox_settings.is_connected():
+            self.listWidget.clear()
+            self.listWidget.addItem("❌ Не подключено к песочнице")
+            return
+
+        # Получаем список счетов через API
+        accounts = sandbox_settings.get_accounts_list()
+
+        if accounts is None:
+            self.listWidget.clear()
+            self.listWidget.addItem("❌ Ошибка при получении списка счетов")
+            return
+
+        # Очищаем текущий список
+        self.listWidget.clear()
+
+        # Заполняем listWidget данными о счетах
+        for account in accounts:
+            item_text = f"{account.broker_account_id} ({account.status})"
+            self.listWidget.addItem(item_text)
+
+    def showEvent(self, event):
+        """Переопределяем событие показа окна — вызываем обновление списка счетов."""
+        super().showEvent(event)
+        self.update_accounts_list()
+
+    def open_create_account_dialog(self):
+        """Открывает диалог создания счёта."""
+        dialog = CreateAccountDialog(self)
+        if dialog.exec() == QDialog.Accepted:
+            data = dialog.get_data()
+            sandbox_settings = self.parent().sandbox_settings
+
+            if not sandbox_settings:
+                self.listWidget.addItem("❌ Настройки песочницы не инициализированы")
+                return
+
+            # Создаём счёт через API
+            new_account = sandbox_settings.create_sandbox_account(
+                currency=data['currency'],
+                initial_balance=data['initial_balance'],
+                name=data['name']
+            )
+
+            if new_account:
+                # Обновляем список счетов сразу после создания
+                self.update_accounts_list()
+                print(f"✅ Счёт создан: {new_account['id']} ({new_account['status']})")
+            else:
+                self.listWidget.addItem("❌ Ошибка при создании счёта")
 
 
 

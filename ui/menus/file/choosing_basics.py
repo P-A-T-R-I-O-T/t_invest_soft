@@ -40,30 +40,23 @@ class ChooseMainAccountMenu(QMenu):
         # Если текущий аккаунт больше не существует — сбрасываем его
         if self.current_account and not self.manager.name_exists(self.current_account):
             self.current_account = None
-            self.settings.remove("last_selected_account") # Удаляем из настроек
-            self._update_window_title() # Обновляем заголовок
+            self.settings.remove("last_selected_account")
+            self._update_window_title()
+            return  # Выходим, чтобы перестроить меню
 
         if not participants:
             no_action = QAction("Нет сохранённых аккаунтов", self.parent())
             no_action.setEnabled(False)
             self.addAction(no_action)
+            return
 
-        # Сбрасываем текущий аккаунт и обновляем заголовок
-        if self.current_account:
-            self.current_account = None
-            self._update_window_title()
-
-        else:
-            for name in participants:
-                action = QAction(name, self.parent())
-                action.setCheckable(True)
-                action.setChecked(name == self.current_account)
-                action.triggered.connect(lambda checked, n=name: self._select_account(n))
-                self.addAction(action)
-        
-        # Обновляем заголовок окна, если текущий аккаунт установлен
-        if self.current_account:
-            self._update_window_title(self.current_account)
+        # Заполняем меню участниками
+        for name in participants:
+            action = QAction(name, self.parent())
+            action.setCheckable(True)
+            action.setChecked(name == self.current_account)
+            action.triggered.connect(lambda checked, n=name: self._select_account(n))
+            self.addAction(action)
 
     def _select_account(self, name: str):
         """Устанавливает выбранный аккаунт и сохраняет его в настройках."""
@@ -72,8 +65,17 @@ class ChooseMainAccountMenu(QMenu):
         self.settings.setValue("last_selected_account", name)
         print(f"✅ Основной аккаунт установлен: {name}")
 
-        # Создаём экземпляр настроек песочницы
-        sandbox = SandboxSettings()
+        # Создаём или получаем существующий экземпляр песочницы
+        if hasattr(self.parent_window, 'sandbox_settings') and self.parent_window.sandbox_settings:
+            sandbox = self.parent_window.sandbox_settings
+        else:
+            sandbox = SandboxSettings()
+
+        # Проверяем, является ли аккаунт песочницей
+        if not self.manager.is_sandbox_user(name):
+            print(f"⚠️ Аккаунт '{name}' не является песочницей. Подключение к API не выполняется.")
+            self.parent_window.sandbox_settings = None
+            return
 
         # Устанавливаем текущий аккаунт для песочницы
         if sandbox.set_current_account(name):
@@ -88,6 +90,7 @@ class ChooseMainAccountMenu(QMenu):
         else:
             print(f"❌ Не удалось установить аккаунт '{name}' для песочницы")
             self.parent_window.sandbox_settings = None
+
 
     def _update_window_title(self, name=None):
         """Обновляет заголовок окна. Если имя не передано — убирает упоминание аккаунта."""
